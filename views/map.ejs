@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>ColoradoFun</title>
+
+  <!-- CSS -->
+  <link href="<%= "/bootstrap/css/theme/" + theme + "/bootstrap.css" %>" rel="stylesheet">
+  <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+  <link href="bootstrap-tree-view/css/core.css" rel="stylesheet" type="text/css">
+  <link href="bootstrap-tree-view/css/tree.css" rel="stylesheet" type="text/css">
+  <link href="/css/style.css" rel="stylesheet">
+
+  <!-- Javascript -->
+  <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  <script src="bootstrap-tree-view/js/core.js" type="text/javascript"></script> 
+  <script src="bootstrap-tree-view/js/tree.js"></script> 
+
+</head>
+
+<body>
+  <div class="container">
+    <header class="header" id="header"></header>
+    <span class="ad_area" id="ad_area1"></span>
+
+    <h2>Search for what intrests you</h2>
+    <div class='form-group' id='searchBar'>
+      <input type="button" size="12" class="datepicker" id="startDate" value='Start Date'>
+      <input type="button" size="12" class="datepicker" id="endDate" value='End Date'>
+      <input type="text" class="inputText" id="titleSearch" onkeyup="activeSearch()" placeholder="Search By Title" ></input>
+      <input type="text" class="inputText" id="locationSearch" onkeyup="activeSearch()" placeholder="Search By Location" ></input>
+      <input type="text" class="inputText" id="categorySearch" onkeyup="activeSearch()" placeholder="Search By Category" ></input>
+      <div id="categoryList"></div>
+    </div>
+
+    <div id="debugWindow"></div>
+    <div id="map"></div>
+    <span class="ad_area" id="ad_area2"></span>
+    <table id="eventList">
+      <tr>
+        <th>Date</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Location</th>
+      </tr>
+    </table>
+
+  	<footer class="footer" id="footer"></footer>
+    <script src="/scripts/template.js"></script>
+  </div> <!-- CONTAINER -->
+  <script>
+
+var map;
+var markers = [];
+Date.prototype.monthNames = [
+"Jan", "Feb", "Mar",
+"Apr", "May", "Jun",
+"Jul", "Aug", "Sep",
+"Oct", "Nov", "Dec"
+];
+
+Date.prototype.getMonthName = function() {
+    return this.monthNames[this.getMonth()];
+};
+
+//function sortByDate(){
+var events = <%- JSON.stringify(events) %>;
+events.map(function(item, i ){
+  item['date']['S'] = new Date(item['date']['S']);
+});
+events.sort(function(a,b) {
+  return a['date']['S']<b['date']['S'] ? -1 : a['date']['S']>b['date']['S'] ? 1 :0;
+});
+
+function initMap(){
+  var Mylat = 39.8;
+  var Mylng = -105.0;
+  /* GeoLocation attempt
+  navigator.geolocation.getCurrentPosition(function(position) {
+    Mylat = position.coords.latitude;
+    Mylng = position.coords.longitude;
+  });
+  */
+  var mapOptions = {
+      zoom: 12,
+      center: {lat: Mylat, lng: Mylng},
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      streetViewControl: false,
+      mapTypeControl: false
+  };
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  events.map(function(data, i){
+    //alert(data['lat']['S']+' and '+data['lng']['S']);
+    var marker =  new google.maps.Marker({
+      position: {lat: parseFloat(data['lat']['S']), lng: parseFloat(data['lng']['S'])},
+      map: map
+    });
+    
+    var infowindow = new google.maps.InfoWindow({
+      content: ''
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+    markers.push({'marker':marker,'info':infowindow});
+    
+  }); // end info loop
+  activeSearch();
+}
+function activeSearch(){
+  // Get values from input fields then filter markers
+  var title = document.getElementById("titleSearch").value;
+  var location = document.getElementById("locationSearch").value;
+  var Sdate = document.getElementById("startDate").value;
+  var Edate = document.getElementById("endDate").value;
+  //var category = document.getElementById("categorySearch").value;
+  if(Sdate != "Start Date") {
+      var start_date = new Date(Sdate + " 12:00"); //correct
+  } else {
+    var start_date = new Date();
+  }
+  if(Edate != "End Date") {
+      var end_date = new Date(Edate + " 12:00"); //correct
+  } else {
+    var end_date = new Date("2020-01-01 12:00");
+  }
+  var TableInfo= `
+  <tr>
+    <th> Date </th>
+    <th> Title </th>
+    <th> Description </th>
+    <th> City </th>
+  </tr>`;
+  // SET ALL MARKERS TO NULL
+  for (var i = 0; i < markers.length; i++) {
+    markers[i]['marker'].setMap(null);
+  };
+  events.map(function(item, i ){
+    var dataDate = item['date']['S'];
+    if(String(item['description']['S']).indexOf(location) > -1) {
+      if(String(item['title']['S']).indexOf(title) > -1) {
+        if(dataDate >= start_date) {
+          if(dataDate <= end_date) {
+            // show the maker and create the table
+            // filter copy events on map to just one icon
+            var dataLat = item['lat']['S'];
+            var dataLng = item['lng']['S'];
+            var unique = true;
+            for (var test=0; test<i; test++){
+              var d1 = markers[test]['marker'].getPosition().lat()-dataLat;
+              var d2 = markers[test]['marker'].getPosition().lng()-dataLng;
+             // alert("Lat:"+d1+" Lng:"+d2);
+              if(Math.abs(d1)<0.0001 && Math.abs(d2)<0.0001){
+                if(markers[test]['marker'].getMap()!=null){
+                  var label = parseInt(markers[test]['marker'].getLabel());
+                  markers[test]['marker'].setLabel(String(label+1));
+                  markers[test]['info'].setContent(markers[test]['info'].getContent()+
+                          '<div id="content">'+
+                            '<p>'+dataDate.getDate()+' '+dataDate.getMonthName()+' - '+item['title']['S']+'</p>'+
+                          '</div>');
+
+                  unique = false;
+                  break;
+                }
+              }
+            }
+            if(unique){
+              markers[i]['marker'].setMap(map);
+              markers[i]['marker'].setLabel("1");
+              markers[i]['info'].setContent(            
+                          '<div id="content">'+
+                            '<div id="siteNotice"></div>'+
+                            '<h2 id="firstHeading" class="firstHeading">'+item['title']['S']+'</h2>'+
+                            '<div id="bodyContent">'+
+                              '<p>'+item['description']['S']+'</p>'+
+                              '<p><h3>'+dataDate.getDate()+' '+dataDate.getMonthName()+'</h3></p>'+
+                              '<a href="/eventinfo?id='+item['id']['S']+'">More Info</a>'+
+                            '</div>'+
+                          '</div>');
+
+            }
+            TableInfo += 
+            '<tr class="event" id="'+item["id"]["S"]+'" onclick="eventSelected(this);">'+
+              '<td class = "DateCol">'+
+                '<p class="day">'+dataDate.getDate()+'</p>'+
+                '<p class="month">'+dataDate.getMonthName()+'</p>'+ 
+              '</td>'+
+              '<td class = "TitleCol">'+item['title']['S']+'</td>'+
+              '<td class = "DescriptionCol">'+item['description']['S']+'</td>'+
+              '<td class = "LocationCol">'+item['city']['S']+'</td>'+
+            '</tr>';
+          }
+        }
+      }
+    }
+  });
+  document.getElementById('eventList').innerHTML = TableInfo;
+}
+  </script>
+  <!-- JAVASCRIPT -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2bgQRRNuFlC9XV0G0k0svzyzpvg6QBHs&callback=initMap">
+  </script>
+
+</body>
+</html>

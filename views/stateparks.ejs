@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>ColoradoFun</title>
+
+  <!-- CSS -->
+  <link href="<%= "/bootstrap/css/theme/" + theme + "/bootstrap.css" %>" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+
+  <!-- Javascript -->
+  <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+</head>
+
+<body>
+	<div class="container">
+  	<header class="header" id="header"></header>
+    <span class="ad_area" id="ad_area1"></span>
+    
+    <h1>Colorado State Parks &amp; Recreation Areas </h1>
+    <p>You will find 42 great State Parks in Colorado offering camping, fishing, horseback riding, whitewater rafting, hiking and so much more! Colorado's geographic diversity is on display throughout these parks. You will experience serenity in the grasslands and lakes of the Eastern Plains or the dynamic Red Rock formations along the Front Range or the majesty of Colorado's Rocky Mountains.</p>
+    <div id="map"></div>
+    <span class="ad_area" id="ad_area2"></span>
+    <div id="parkList"></div>
+  	<footer class="footer" id="footer"></footer>
+  </div> <!-- CONTAINER -->
+  <!-- JAVASCRIPT -->
+  <script src="/scripts/template.js"></script>
+  <script>
+    window.onload = function initPage() {
+      $.ajax({
+        url: '/csv/stateParks.csv',
+        dataType: 'text',
+      }).done(initMap);
+    }
+    function initMap(data) {
+      var infoRows = data.split(/\r?\n|\r/);
+      var mapOptions = {
+          zoom: 7,
+          center: {lat: 39.4, lng: -105.0},
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          streetViewControl: false,
+          mapTypeControl: false
+      };
+      var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+      //var debug = document.getElementById("test");
+
+      infoRows.map(function(info, i){
+
+        // MAKE THE MAP
+        var item = info.split("|");
+        var contentString = '<h2 id="firstHeading" class="firstHeading">'+
+                              '<a href='+item[4]+'>'+
+                                item[3]+
+                              '</a>'+
+                            '</h2>'+
+                            item[0];
+
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+        var marker =  new google.maps.Marker({
+          position: {lat: parseFloat(item[1]), lng: parseFloat(item[2])},
+          map: map
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+
+        // MAKE THE LIST
+        var list = document.getElementById("parkList");
+        list.innerHTML += contentString;
+
+
+      });
+    }
+    </script>
+  <!-- JAVASCRIPT -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2bgQRRNuFlC9XV0G0k0svzyzpvg6QBHs&callback=initPage">
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>ColoradoFun</title>
+
+  <!-- CSS -->
+  <link href="<%= "/bootstrap/css/theme/" + theme + "/bootstrap.css" %>" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+
+  <!-- Javascript -->
+  <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header class="header" id="header"></header>
+    <span class="ad_area" id="ad_area1"></span>
+    
+    <h1 id='title'></h1>
+    <div id="info" style="float:left"></div>
+
+    <div id="map" style="width:600px; height:400px"></div>
+    <span class="ad_area" id="ad_area2"></span>
+    <footer class="footer" id="footer"></footer>
+  </div> <!-- CONTAINER -->
+  <!-- JAVASCRIPT -->
+  <script src="/scripts/template.js"></script>
+  <script>
+    var event = <%- JSON.stringify(event) %>;
+    //alert(event['lat']['S']);
+    document.getElementById("title").innerHTML = 'Title: '+event['title']['S'];
+    document.getElementById("info").innerHTML = 'Descirption: '+event['description']['S']+'<br> Date: '+event['date']['S'];
+    function initMap() {
+      var mapOptions = {
+          zoom: 9,
+          center: {lat: parseFloat(event['lat']['S']), lng: parseFloat(event['lng']['S'])},
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          streetViewControl: false,
+          mapTypeControl: false
+      };
+      var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+      var marker = new google.maps.Marker({
+        position: {lat: parseFloat(event['lat']['S']), lng: parseFloat(event['lng']['S'])},
+        map: map,
+        title: 'Hello World!'
+      });
+
+    }
+  </script>
+  <!-- JAVASCRIPT -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2bgQRRNuFlC9XV0G0k0svzyzpvg6QBHs&callback=initMap">
+  </script>
+</body>
+</html>
