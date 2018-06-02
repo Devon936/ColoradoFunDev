@@ -91,18 +91,17 @@ function eventSelected(obj) {
     	var NewInfo = '<td colspan=4>'+
     	'<div>'+
     	'<img src="/images/example.jpg" style="width:80px; height:80px; float:left; margin:2px 10px 2px 2px">'+
-    	'Full Description. <a href="#">Link to outside source</a> '+
-    	info['title']['S']+
-    	'Links to similar events.'+
-    	'Anything else desired from full event page'+
+    	'<h3>'+info['title']['S']+'</h3><br><a href="/eventinfo?id='+info['id']['S']+'">  --Click Here to Learn More!--  </a>'+
+    	'<br>'+info['description']['S']+
     	'</div>'+
     	// Suggested Events List
+    	/*
     	'<div id="suggested-events-list" style="border-style: solid; margin: 10px; float: right">Similar Events'+
     	'<ul>'+
-			'<li><a Event 1</li>'+
+			'<li>Event 1</li>'+
 			'<li>Event 2</li>'+
 		'</ul></div>'+
-		'<a href="/eventinfo?id='+info['id']['S']+'">More Info</a>'+
+		*/
     	// ad banner
     	'<div>'+
     	'<div id="sidebar-wrapper" style="border-style: solid; margin: 5px 5px 5px 85px; width:500px">'+

@@ -6,8 +6,15 @@ import random
 from elizabeth import Text, Address
 import datetime
 
-db = boto3.resource('dynamodb')
-table = db.Table('ColoradoFunEvents')
+if(len(sys.argv) == 2): # action with given argument
+	print("Custom Behavior: Saving to ", sys.argv[1])
+	db = boto3.resource('dynamodb')
+	table = db.Table(sys.argv[1])
+else: # default action
+	print("Default Behavior: Saving to Development Databasee")
+	db = boto3.resource('dynamodb')
+	table = db.Table('ColoradoFunDevTable')
+	
 text = Text('en')
 address = Address('en')
 

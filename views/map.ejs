@@ -87,7 +87,7 @@ function initMap(){
   });
   */
   var mapOptions = {
-      zoom: 12,
+      zoom: 9,
       center: {lat: Mylat, lng: Mylng},
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       streetViewControl: false,
@@ -177,7 +177,7 @@ function activeSearch(){
                             '<div id="siteNotice"></div>'+
                             '<h2 id="firstHeading" class="firstHeading">'+item['title']['S']+'</h2>'+
                             '<div id="bodyContent">'+
-                              '<p>'+item['description']['S']+'</p>'+
+                              '<p>'+item['description']['S'].substring(0,123)+'...</p>'+
                               '<p><h3>'+dataDate.getDate()+' '+dataDate.getMonthName()+'</h3></p>'+
                               '<a href="/eventinfo?id='+item['id']['S']+'">More Info</a>'+
                             '</div>'+
@@ -191,7 +191,7 @@ function activeSearch(){
                 '<p class="month">'+dataDate.getMonthName()+'</p>'+ 
               '</td>'+
               '<td class = "TitleCol">'+item['title']['S']+'</td>'+
-              '<td class = "DescriptionCol">'+item['description']['S']+'</td>'+
+              '<td class = "DescriptionCol">'+item['description']['S'].substring(0,123)+'...</td>'+
               '<td class = "LocationCol">'+item['city']['S']+'</td>'+
             '</tr>';
           }

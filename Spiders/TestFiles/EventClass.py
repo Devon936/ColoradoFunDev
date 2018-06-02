@@ -7,17 +7,17 @@ import json
 
 class Event:
 	def __init__(self):
-		self.id = ""
-		self.title = ""
-		self.link = ""
-		self.description = ""
-		self.date = ""
-		self.category = []
-		self.address = ""
-		self.city = ""
-		self.lat = ""
-		self.lng = ""
-		self.image = ""
+		self.id = "none"
+		self.title = "none"
+		self.link = "none"
+		self.description = "none"
+		self.date = "none"
+		self.category = ["none"]
+		self.address = "none"
+		self.city = "none"
+		self.lat = "none"
+		self.lng = "none"
+		self.image = "none"
 
 	def toJSON(self):
 		jd = {}
@@ -39,17 +39,17 @@ class Event:
 			found_address = str(pyap.parse(string, country='US')[0])
 			g = geocoder.google(found_address)
 			address = g.housenumber +" "+ g.street
-			return address, g.city, g.state, g.postal, g.lat, g.lng
+			return address, g.city, g.lat, g.lng
 		except:
-			return "","","","","",""
+			return "","","",""
 
 	def addressFinderBasic(self,string):
 		try:
 			g = geocoder.google(string)
 			address = g.housenumber +" "+ g.street
-			return address, g.city, g.state, g.postal, g.lat, g.lng
+			return address, g.city, g.lat, g.lng
 		except:
-			return "","","","","",""
+			return "","","",""
 
 	def categoryFinder(self,information):
 		categoryList = [' running', ' bicycle',' music ','riveer rafting',' zip line',' horseback', ' free']

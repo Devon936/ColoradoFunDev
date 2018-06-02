@@ -34,8 +34,9 @@
   <script>
     var event = <%- JSON.stringify(event) %>;
     //alert(event['lat']['S']);
-    document.getElementById("title").innerHTML = 'Title: '+event['title']['S'];
-    document.getElementById("info").innerHTML = 'Descirption: '+event['description']['S']+'<br> Date: '+event['date']['S'];
+    document.getElementById("title").innerHTML = event['title']['S']+'<br><h3>'+event['date']['S']+'</h3>';
+    document.getElementById("info").innerHTML = '\nDescirption: '+event['description']['S']+
+        '<br><a href="'+event['link']['S']+'">Original event info source page</a>';
     function initMap() {
       var mapOptions = {
           zoom: 9,

@@ -64,7 +64,7 @@ app.get('/golfcourse', function(req, res) {
 app.get('/eventInfo', function(req, res) {
     var data = req.query;
     var params = {
-      TableName: 'ColoradoFunEvents',
+      TableName: 'ColoradoFunDevTable',
       Key: {
         'id' : {S: data.id},
       }
@@ -74,7 +74,14 @@ app.get('/eventInfo', function(req, res) {
       if (err) {
         console.log("Error", err);
       } else {
-        console.log("Success", data.Item);
+        // Find events within 10 miles
+        var eventLat = data.Item['lat']['S'];
+        var eventLng = data.Item['lng']['S'];
+        var latRange = 69.172/10;
+        var lngRange = 10/(Math.cos(eventLat*3.1415926/180)*69.172)
+
+        // find events where eventLat+latRange<lat<eventLat+latRange
+        //               AND eventLng+lngRange<lng<eventLng+lngRange
         res.render('eventinfo', {
             event: data.Item,
             theme: process.env.THEME || 'default',
@@ -86,7 +93,7 @@ app.get('/eventInfo', function(req, res) {
 
 app.get('/map', function(req, res) {
     var params = {
-        TableName: 'ColoradoFunEvents'
+        TableName: 'ColoradoFunDevTable'
     }
     var Mydata = [];
     ddb.scan(params, function(err, data){
