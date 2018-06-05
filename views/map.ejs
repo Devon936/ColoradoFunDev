@@ -102,7 +102,8 @@ function initMap(){
     });
     
     var infowindow = new google.maps.InfoWindow({
-      content: ''
+      content: '',
+      maxWidth: 380
     });
     marker.addListener('click', function() {
       infowindow.open(map, marker);
@@ -161,7 +162,10 @@ function activeSearch(){
                   markers[test]['marker'].setLabel(String(label+1));
                   markers[test]['info'].setContent(markers[test]['info'].getContent()+
                           '<div id="content">'+
-                            '<p>'+dataDate.getDate()+' '+dataDate.getMonthName()+' - '+item['title']['S']+'</p>'+
+                            '<a href="/eventinfo?id='+item['id']['S']+'">'+
+                              '<p>'+dataDate.getDate()+' '+dataDate.getMonthName()+' - '+item['title']['S']+
+                              '</p>'+
+                            '</a>'+
                           '</div>');
 
                   unique = false;
@@ -175,11 +179,12 @@ function activeSearch(){
               markers[i]['info'].setContent(            
                           '<div id="content">'+
                             '<div id="siteNotice"></div>'+
-                            '<h2 id="firstHeading" class="firstHeading">'+item['title']['S']+'</h2>'+
+                              '<h2 id="firstHeading" class="firstHeading">'+
+                                '<a href="/eventinfo?id='+item['id']['S']+'">'+item['title']['S']+'</a>'+
+                              '</h2>'+
                             '<div id="bodyContent">'+
                               '<p>'+item['description']['S'].substring(0,123)+'...</p>'+
                               '<p><h3>'+dataDate.getDate()+' '+dataDate.getMonthName()+'</h3></p>'+
-                              '<a href="/eventinfo?id='+item['id']['S']+'">More Info</a>'+
                             '</div>'+
                           '</div>');
 
