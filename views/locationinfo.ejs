@@ -22,37 +22,38 @@
     <header class="header" id="header"></header>
     <span class="ad_area" id="ad_area1"></span>
     <a href="/map">Back to Search Results</a>
-    <h1 id='title'></h1>
+    <div id='title'></div>
     <div id="info" style="float:left"></div>
-
-    <div id="map" style="width:600px; height:400px"></div>
     <span class="ad_area" id="ad_area2"></span>
     <footer class="footer" id="footer"></footer>
   </div> <!-- CONTAINER -->
   <!-- JAVASCRIPT -->
   <script src="/scripts/template.js"></script>
   <script>
-    var event = <%- JSON.stringify(event) %>;
-    //alert(event['lat']['S']);
-    document.getElementById("title").innerHTML = event['title']['S']+'<br><h3>'+event['date']['S']+'</h3>';
-    document.getElementById("info").innerHTML = '\nDescirption: '+event['description']['S']+
-        '<br><a href="'+event['link']['S']+'">Original event info source page</a>';
-    function initMap() {
-      var mapOptions = {
-          zoom: 9,
-          center: {lat: parseFloat(event['lat']['S']), lng: parseFloat(event['lng']['S'])},
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          streetViewControl: false,
-          mapTypeControl: false
-      };
-      var map = new google.maps.Map(document.getElementById('map'), mapOptions);
-      var marker = new google.maps.Marker({
-        position: {lat: parseFloat(event['lat']['S']), lng: parseFloat(event['lng']['S'])},
-        map: map,
-        title: 'Hello World!'
-      });
 
-    }
+Date.prototype.monthNames = [
+"Jan", "Feb", "Mar",
+"Apr", "May", "Jun",
+"Jul", "Aug", "Sep",
+"Oct", "Nov", "Dec"
+];
+
+Date.prototype.getMonthName = function() {
+    return this.monthNames[this.getMonth()];
+};
+
+
+    var events = <%- JSON.stringify(events) %>;
+    events.map(function(item,i){
+      item['date']['S'] = new Date(item['date']['S']);
+      document.getElementById('title').innerHTML += '<container>'+
+      '<h3>'+item['title']['S']+' - '+item['date']['S'].getMonthName()+
+        ', '+item['date']['S'].getDate()+'</h3>'+
+      '<p>'+item['description']['S']+'   '+
+      '<span><a href='+item['link']['S']+'>View source info'+
+      '</a></span></p><br>'+
+      '</container>';
+    });
   </script>
   <!-- JAVASCRIPT -->
   <script async defer

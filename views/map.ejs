@@ -28,7 +28,7 @@
     <header class="header" id="header"></header>
     <span class="ad_area" id="ad_area1"></span>
 
-    <h2>Search for what intrests you</h2>
+    <h2>Search for fun things to do!</h2>
     <div class='form-group' id='searchBar'>
       <input type="button" size="12" class="datepicker" id="startDate" value='Start Date'>
       <input type="button" size="12" class="datepicker" id="endDate" value='End Date'>
@@ -79,7 +79,7 @@ events.sort(function(a,b) {
 
 function initMap(){
   var Mylat = 39.8;
-  var Mylng = -105.0;
+  var Mylng = -105.1;
   /* GeoLocation attempt
   navigator.geolocation.getCurrentPosition(function(position) {
     Mylat = position.coords.latitude;
@@ -87,7 +87,7 @@ function initMap(){
   });
   */
   var mapOptions = {
-      zoom: 9,
+      zoom: 13,
       center: {lat: Mylat, lng: Mylng},
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       streetViewControl: false,
@@ -156,20 +156,35 @@ function activeSearch(){
               var d1 = markers[test]['marker'].getPosition().lat()-dataLat;
               var d2 = markers[test]['marker'].getPosition().lng()-dataLng;
              // alert("Lat:"+d1+" Lng:"+d2);
-              if(Math.abs(d1)<0.0001 && Math.abs(d2)<0.0001){
-                if(markers[test]['marker'].getMap()!=null){
+              if(markers[test]['marker'].getMap()!=null){ // if the test marker is on the map
+                if(i == events.length-1){
                   var label = parseInt(markers[test]['marker'].getLabel());
+                  if(label >= 4){
+                    //alert(events[test]['lat']['S']);
+                    markers[test]['info'].setContent(markers[test]['info'].getContent()+
+                    '<div id="content">'+
+                      '<a href="/locationinfo?lat='+events[test]['lat']['S']+'&lng='+events[test]['lng']['S']+'">'+
+                        '<p>View these and '+(label-4)+' more events ...</p>'+
+                      '</a>'+
+                    '</div>');
+                  }
+                }
+                if(Math.abs(d1)<0.0001 && Math.abs(d2)<0.0001){ // if the position is the same
+                  var label = parseInt(markers[test]['marker'].getLabel());
+                  if( label < 4){
+                    markers[test]['info'].setContent(markers[test]['info'].getContent()+
+                            '<div id="content">'+
+                              '<a href="/eventinfo?id='+item['id']['S']+'">'+
+                                '<p>'+dataDate.getDate()+' '+dataDate.getMonthName()+' - '+item['title']['S']+
+                                '</p>'+
+                              '</a>'+
+                            '</div>');
+                  }
                   markers[test]['marker'].setLabel(String(label+1));
-                  markers[test]['info'].setContent(markers[test]['info'].getContent()+
-                          '<div id="content">'+
-                            '<a href="/eventinfo?id='+item['id']['S']+'">'+
-                              '<p>'+dataDate.getDate()+' '+dataDate.getMonthName()+' - '+item['title']['S']+
-                              '</p>'+
-                            '</a>'+
-                          '</div>');
-
                   unique = false;
-                  break;
+                  if(i != events.length-1){
+                    break;
+                  }
                 }
               }
             }
@@ -183,7 +198,7 @@ function activeSearch(){
                                 '<a href="/eventinfo?id='+item['id']['S']+'">'+item['title']['S']+'</a>'+
                               '</h2>'+
                             '<div id="bodyContent">'+
-                              '<p>'+item['description']['S'].substring(0,123)+'...</p>'+
+                              '<p>'+item['description']['S'].substring(0,184)+'...</p>'+
                               '<p><h3>'+dataDate.getDate()+' '+dataDate.getMonthName()+'</h3></p>'+
                             '</div>'+
                           '</div>');

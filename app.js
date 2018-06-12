@@ -75,10 +75,11 @@ app.get('/eventInfo', function(req, res) {
         console.log("Error", err);
       } else {
         // Find events within 10 miles
+        var range = 10;
         var eventLat = data.Item['lat']['S'];
         var eventLng = data.Item['lng']['S'];
-        var latRange = 69.172/10;
-        var lngRange = 10/(Math.cos(eventLat*3.1415926/180)*69.172)
+        var latRange = 69.172/range;
+        var lngRange = range/(Math.cos(eventLat*3.1415926/180)*69.172)
 
         // find events where eventLat+latRange<lat<eventLat+latRange
         //               AND eventLng+lngRange<lng<eventLng+lngRange
@@ -91,6 +92,35 @@ app.get('/eventInfo', function(req, res) {
     });
 });
 
+app.get('/locationInfo', function(req, res) {
+    var data = req.query;
+    var params = {
+      TableName: 'ColoradoFunDevTable',
+      FilterExpression: '#lat = :lat and #lng = :lng',
+      ExpressionAttributeNames: {
+        "#lat":"lat",
+        "#lng":"lng"
+      },
+      ExpressionAttributeValues: {
+        ':lat': {S: data.lat},
+        ':lng': {S: data.lng}
+      },
+    };
+    // Call DynamoDB to read the item from the table
+    ddb.scan(params, function(err, data) {
+      if (err) {
+        console.log("Error", err);
+      } else {  
+        res.render('locationinfo', {
+            events: data.Items,
+            theme: process.env.THEME || 'default',
+            flask_debug: process.env.FLASK_DEBUG || 'false'
+        });
+      }
+    });
+});
+
+
 app.get('/map', function(req, res) {
     var params = {
         TableName: 'ColoradoFunDevTable'
@@ -100,15 +130,12 @@ app.get('/map', function(req, res) {
         if(err){
             console.log("error", err);
         } else {
-            data.Items.forEach(function(element, index, array) {
-                Mydata.push(element);
-            });        
+            res.render('map', {
+                events: data.Items,
+                theme: process.env.THEME || 'default',
+                flask_debug: process.env.FLASK_DEBUG || 'false' 
+            });       
         }
-        res.render('map', {
-            events: Mydata,
-            theme: process.env.THEME || 'default',
-            flask_debug: process.env.FLASK_DEBUG || 'false' 
-        });
     })
 });
 app.get('/user', function(req, res) {
